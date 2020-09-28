@@ -29,12 +29,16 @@ function shouldSkipProperty(global, p) {
 // safari unpredictably lists some new globals first or second in object order
 let firstGlobalProp, secondGlobalProp, lastGlobalProp;
 
-export function getGlobalProp(global) {
+export function getGlobalProp(global, propKey) {
 	let cnt = 0;
 	let lastProp;
 	let hasIframe = false;
+  let lifecycleProp;
 
 	for (let p in global) {
+    if(p.includes(propKey)){
+      lifecycleProp = p;
+    }
 		if (shouldSkipProperty(global, p))
 			continue;
 
@@ -55,6 +59,10 @@ export function getGlobalProp(global) {
 
 	if (lastProp !== lastGlobalProp)
 		return lastProp;
+
+  if (isIE11) {
+    return lifecycleProp;
+  }
 }
 
 export function noteGlobalProps(global) {

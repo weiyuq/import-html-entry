@@ -133,7 +133,7 @@ const supportsUserTiming =
  * @param opts
  * @returns {Promise<unknown>}
  */
-export function execScripts(entry, scripts, proxy = window, opts = {}) {
+export function execScripts(entry, scripts, proxy = window, propKey, opts = {}) {
 	const {
 		fetch = defaultFetch, strictGlobal = false, success, error = () => {
 		}, beforeExec = () => {
@@ -163,7 +163,7 @@ export function execScripts(entry, scripts, proxy = window, opts = {}) {
 					try {
 						// bind window.proxy to change `this` reference in script
 						geval(getExecutableScript(scriptSrc, inlineScript, proxy, strictGlobal));
-						const exports = proxy[getGlobalProp(strictGlobal ? proxy : window)] || {};
+						const exports = proxy[getGlobalProp(strictGlobal ? proxy : window, propKey)] || {};
 						resolve(exports);
 					} catch (e) {
 						// consistent with browser behavior, any independent script evaluation error should not block the others
@@ -216,7 +216,7 @@ export function execScripts(entry, scripts, proxy = window, opts = {}) {
 		});
 }
 
-export default function importHTML(url, opts = {}) {
+export default function importHTML(url, propKey, opts = {}) {
 	let fetch = defaultFetch;
 	let getPublicPath = defaultGetPublicPath;
 	let getTemplate = defaultGetTemplate;
@@ -246,13 +246,13 @@ export default function importHTML(url, opts = {}) {
 					if (!scripts.length) {
 						return Promise.resolve();
 					}
-					return execScripts(entry, scripts, proxy, { fetch, strictGlobal });
+					return execScripts(entry, scripts, proxy, propKey, { fetch, strictGlobal });
 				},
 			}));
 		}));
 }
 
-export function importEntry(entry, opts = {}) {
+export function importEntry(entry, propKey, opts = {}) {
 	const { fetch = defaultFetch, getTemplate = defaultGetTemplate } = opts;
 	const getPublicPath = opts.getPublicPath || opts.getDomain || defaultGetPublicPath;
 
@@ -281,7 +281,7 @@ export function importEntry(entry, opts = {}) {
 				if (!scripts.length) {
 					return Promise.resolve();
 				}
-				return execScripts(scripts[scripts.length - 1], scripts, proxy, { fetch, strictGlobal });
+				return execScripts(scripts[scripts.length - 1], scripts, proxy, propKey, { fetch, strictGlobal });
 			},
 		}));
 

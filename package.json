@@ -1,5 +1,5 @@
 {
-  "name": "import-html-entry",
+  "name": "IGW-import-html-entry",
   "version": "1.9.1",
   "description": "import html and get the exports of entry",
   "main": "./lib/index.js",
